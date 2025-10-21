@@ -16,6 +16,9 @@ export function initRender(stageEl) {
   fxCtx = fxCanvas.getContext("2d", { alpha: true });
   stageEl.appendChild(fxCanvas);
 
+  ctx.lineJoin = "bevel";
+  ctx.miterLimit = 2;
+
   resizeCanvas(stageEl);
   window.addEventListener("resize", () => resizeCanvas(stageEl));
 }
@@ -43,16 +46,15 @@ export function screenToIso(px, py) {
 }
 
 export function sortForRender(a, b) {
-  const da = a.x + a.y + a.z * 2;
-  const db = b.x + b.y + b.z * 2;
+  const da = (a.x + a.y) + a.z * 6;   
+  const db = (b.x + b.y) + b.z * 6;
   return da - db;
 }
 
 function drawPoly(points, fill, stroke, lw = 1) {
   ctx.beginPath();
   ctx.moveTo(points[0].sx, points[0].sy);
-  for (let i = 1; i < points.length; i++)
-    ctx.lineTo(points[i].sx, points[i].sy);
+  for (let i = 1; i < points.length; i++) ctx.lineTo(points[i].sx, points[i].sy);
   ctx.closePath();
   if (fill) {
     ctx.fillStyle = fill;
@@ -65,32 +67,44 @@ function drawPoly(points, fill, stroke, lw = 1) {
   }
 }
 
-export function drawIsoBlock(b, highlighted) {
+/** Projeta somente as 3 faces visíveis (frente, direita e topo) */
+export function getBlockPolys(b) {
   const { x, y, z, len: L, dep: D, hgt: H, rot90 } = b;
-  const BL = rot90 ? D / 2 : L / 2;
-  const BD = rot90 ? L / 2 : D / 2;
+  const BL = rot90 ? D / 2.1 : L / 2.27;
+  const BD = rot90 ? L / 2.27 : D / 2;
 
-  const p000 = ISO.project(x - BL, y - BD, z);
+  const p000 = ISO.project(x - BL, y - BD, z );
   const p100 = ISO.project(x + BL, y - BD, z);
   const p110 = ISO.project(x + BL, y + BD, z);
   const p010 = ISO.project(x - BL, y + BD, z);
   const p001 = ISO.project(x - BL, y - BD, z + H);
   const p101 = ISO.project(x + BL, y - BD, z + H);
   const p111 = ISO.project(x + BL, y + BD, z + H);
-  const p011 = ISO.project(x - BL, y + BD, z + H);
+  const p011 = ISO.project(x - BL, y + BD, z + H );
+
+  // Frente real: y = +BD
+  const front = [p011, p111, p110, p010];
+  // Direita: x = +BL
+  const right = [p101, p111, p110, p100];
+  // Topo
+  const top   = [p001, p101, p111, p011];
+
+  return { top, right, front };
+}
+
+export function drawIsoBlock(b, highlighted) {
+  const { top, right, front } = getBlockPolys(b);
 
   ctx.save();
-
   if (typeof b.alpha === "number") ctx.globalAlpha = b.alpha;
 
-  drawPoly([p011, p111, p110, p010], COLORS.left[b.class], COLORS.edge);
-
-  drawPoly([p101, p111, p110, p100], COLORS.right[b.class], COLORS.edge);
-
-  drawPoly([p001, p101, p111, p011], COLORS.top[b.class], COLORS.edge);
+  // Ordem que mantém o “paralelepípedo” fechado e alinhado
+  drawPoly(front, COLORS.left[b.class],  COLORS.edge);
+  drawPoly(right, COLORS.right[b.class], COLORS.edge);
+  drawPoly(top,   COLORS.top[b.class],   COLORS.edge);
 
   if (highlighted && b.clickable) {
-    drawPoly([p001, p101, p111, p011], null, COLORS.hi, 2);
+    drawPoly(top, null, COLORS.hi, 2);
   }
   ctx.restore();
 }
@@ -99,8 +113,7 @@ function drawTableShadow() {
   const w = canvas.clientWidth || 1280;
   const h = canvas.clientHeight || 720;
   const r = 160 * game.scale;
-  const cx = w / 2,
-    cy = h * 0.92 + 6;
+  const cx = w / 2, cy = h * 0.92 + 1;
   ctx.save();
   ctx.fillStyle = COLORS.tableShadow;
   ctx.beginPath();
@@ -118,15 +131,19 @@ export function startRender() {
     ctx.fillRect(0, 0, w, h);
 
     drawTableShadow();
+
     ctx.save();
     ctx.translate(game.offsetX, game.offsetY);
     ctx.scale(game.scale, game.scale);
 
     const toDraw = game.blocks
-      .filter((b) => !b.removed)
+      .filter(b => !b.removed)
       .slice()
       .sort(sortForRender);
-    for (const b of toDraw) drawIsoBlock(b, b.id === game.hovered);
+
+    for (const b of toDraw) {
+      drawIsoBlock(b, b.id === game.hovered);
+    }
 
     ctx.restore();
     requestAnimationFrame(frame);
@@ -134,6 +151,7 @@ export function startRender() {
   requestAnimationFrame(frame);
 }
 
+/** FX já existente */
 export function spawnConfettiAtBlock(block) {
   const base = ISO.project(block.x, block.y, block.z + block.hgt + 10);
   const sx = base.sx * game.scale + game.offsetX;
@@ -142,12 +160,10 @@ export function spawnConfettiAtBlock(block) {
   const parts = [];
   for (let i = 0; i < 28; i++) {
     parts.push({
-      x: sx,
-      y: sy,
+      x: sx, y: sy,
       vx: Math.random() * 4 - 2,
       vy: Math.random() * -3 - 1.5,
-      life: 0,
-      max: 40 + Math.random() * 24,
+      life: 0, max: 40 + Math.random() * 24,
       s: 2 + Math.random() * 2,
     });
   }
@@ -160,9 +176,7 @@ export function spawnConfettiAtBlock(block) {
         alive = true;
         p.x += p.vx;
         p.y += p.vy + p.life * 0.02;
-        fxCtx.fillStyle = ["#fff", "#f59e0b", "#7aa0ff", "#16a34a", "#ef4444"][
-          p.life % 5
-        ];
+        fxCtx.fillStyle = ["#fff", "#f59e0b", "#7aa0ff", "#16a34a", "#ef4444"][p.life % 5];
         fxCtx.fillRect(p.x, p.y, p.s, p.s);
       }
     }

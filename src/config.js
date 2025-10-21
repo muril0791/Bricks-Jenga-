@@ -24,15 +24,15 @@ export const MATH = {
 };
 
 export const CONFIG = {
-  TIERS: 10,                   
+  TIERS: 12,                   
   BLOCKS_PER_ROW: 3,
 
-  BL_LEN: 150,
-  BL_DEP: 50,
-  BL_HGT: 22,
+  BL_LEN: 100,
+  BL_DEP: 30,
+  BL_HGT: 20,
 
   GAP: 0.0,
-  ROW_GAP: 0.5,
+  ROW_GAP: 0,
   VIEWPORT_PAD: 0.90,
 
   BET_MIN: 0.10,
