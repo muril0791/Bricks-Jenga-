@@ -6,6 +6,7 @@ export const els = {
   betInput: /** @type {HTMLInputElement} */(document.querySelector("#betInput")),
   currencySel: /** @type {HTMLSelectElement} */(document.querySelector("#currency")),
   langSel: /** @type {HTMLSelectElement} */(document.querySelector("#lang")),
+  noCrashEl: /** @type {HTMLInputElement} */(document.querySelector("#noCrash")),
   btnPlaceBet: /** @type {HTMLButtonElement} */(document.querySelector("#placeBet")),
   btnCashOut: /** @type {HTMLButtonElement} */(document.querySelector("#cashOut")),
   btnRandomPick: /** @type {HTMLButtonElement} */(document.querySelector("#randomPick")),
@@ -52,3 +53,4 @@ export function flashStatus(msg, ms = 1400) {
     refreshHUD(game.phase);
   }, ms);
 }
+

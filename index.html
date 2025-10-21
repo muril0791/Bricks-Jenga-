@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -11,6 +11,7 @@
       <aside class="panel">
         <header class="brand">
           <h1>Jenga</h1>
+          <div class="sub">Prototype</div>
         </header>
 
         <section class="controls">
@@ -21,6 +22,7 @@
               <option value="CAD">CAD</option>
             </select>
           </div>
+
           <div class="row">
             <label for="lang">Language</label>
             <select id="lang">
@@ -30,12 +32,27 @@
             </select>
           </div>
 
+          <div class="row">
+            <label for="noCrash">No Crash (debug)</label>
+            <label class="switch">
+              <input id="noCrash" type="checkbox" />
+              <span class="slider"></span>
+            </label>
+          </div>
+
           <div class="divider"></div>
 
           <div class="row">
             <label for="betInput" id="betLabel">Bet</label>
-            <input id="betInput" type="number" min="0.1" step="0.1" value="1.0" />
+            <input
+              id="betInput"
+              type="number"
+              min="0.1"
+              step="0.1"
+              value="1.0"
+            />
           </div>
+
           <div class="row two">
             <button id="placeBet" class="btn primary">Place Bet</button>
             <button id="cashOut" class="btn success" disabled>Cash Out</button>
@@ -47,19 +64,30 @@
           </div>
 
           <div class="info">
-            <div class="stat"><span id="multiplier">×1.00</span> <small>Multiplier</small></div>
-            <div class="stat"><span id="potential">—</span> <small>Potential payout</small></div>
-            <div class="stat"><span id="status">Waiting</span> <small>Status</small></div>
+            <div class="stat">
+              <span id="multiplier">×1.00</span> <small>Multiplier</small>
+            </div>
+            <div class="stat">
+              <span id="potential">—</span> <small>Potential payout</small>
+            </div>
+            <div class="stat">
+              <span id="status">Waiting</span> <small>Status</small>
+            </div>
           </div>
 
           <details class="legend">
             <summary>Legend / Odds</summary>
             <div class="legend-grid">
-              <div class="chip safe"></div><span>Safe — low bust chance, +1.0× to +1.5×</span>
-              <div class="chip risky"></div><span>Risky — medium bust chance, +2× to +5×</span>
-              <div class="chip critical"></div><span>Critical — high bust chance, +10×</span>
-              <div class="chip golden"></div><span>Golden — instant bonus; highest bust chance</span>
-              <div class="chip disabled"></div><span>Disabled — blocked</span>
+              <div class="chip safe"></div>
+              <span>Safe — low fail, +1.0× to +1.5×</span>
+              <div class="chip risky"></div>
+              <span>Risky — medium fail, +2× to +5×</span>
+              <div class="chip critical"></div>
+              <span>Critical — high fail, +10×</span>
+              <div class="chip golden"></div>
+              <span>Golden — instant bonus; higher fail</span>
+              <div class="chip disabled"></div>
+              <span>Disabled — blocked</span>
             </div>
           </details>
         </section>
@@ -67,7 +95,7 @@
 
       <main>
         <div id="stage"></div>
-        <div id="tooltip" class="tooltip" style="display:none"></div>
+        <div id="tooltip" class="tooltip" style="display: none"></div>
       </main>
     </div>
 

@@ -40,4 +40,7 @@ export const CONFIG = {
 
   PULL_TIME_MS: 320,
   COLLAPSE_TIME_MS: 1400,     
+
+  NO_CRASH: false,
+  
 };

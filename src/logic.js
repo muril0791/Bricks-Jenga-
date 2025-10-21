@@ -12,40 +12,34 @@ export function buildTower() {
 
   for (let tier = 0; tier < CONFIG.TIERS; tier++) {
     const rot90 = tier % 2 === 1;
-    const z = tier * (H + ROW_GAP );
+    const z = tier * (H + ROW_GAP);
+
+    
+    const riskySlot = (Math.random() * CONFIG.BLOCKS_PER_ROW) | 0;
 
     for (let i = 0; i < CONFIG.BLOCKS_PER_ROW; i++) {
       const id = `${tier}-${i}`;
-      const klass = i === 1 ? "risky" : "safe";
-      const sideOffset = (i - 1) * (D + GAP );
+      const klass = Math.random() < 0.33 ? "risky" : "safe";
+      const sideOffset = (i - 1) * (D + GAP);
 
-      // AJUSTE: desloca no eixo perpendicular ao comprimento
-      // dentro de buildTower(), no loop dos blocos
+      
       const x = rot90 ? sideOffset : 0;
-      const y = rot90 ? 1 : sideOffset;
+      const y = rot90 ? 0 : sideOffset; 
 
       game.blocks.push({
-        id,
-        tier,
-        index: i,
-        class: klass,
-        golden: false,
-        removed: false,
-        x,
-        y,
-        z,
-        len: L,
-        dep: D,
-        hgt: H,
-        rot90,
-        alpha: 1,
-        clickable: true,
+        id, tier, index: i,
+        class: klass, golden: false, removed: false,
+        x, y, z, len: L, dep: D, hgt: H, rot90,
+        alpha: 1, clickable: true,
       });
     }
   }
+
+
   sprinkleGoldenOnSpawn();
   layoutView();
 }
+
 
 function sprinkleGoldenOnSpawn() {
   const count = Math.floor(rnd(MATH.golden.spawnMin, MATH.golden.spawnMax + 1));
@@ -118,7 +112,7 @@ export async function tryPull(block) {
   setPhase(PHASE.RESOLVING);
 
   const odds = oddsFor(block);
-  const failed = Math.random() < odds.failure;
+  const failed = CONFIG.NO_CRASH ? false : (Math.random() < odds.failure);
 
   await animatePull(block);
 
@@ -158,22 +152,34 @@ export async function tryPull(block) {
 }
 
 function reclassifyRowAfterRemoval(removed) {
-  const sameRow = game.blocks.filter(
-    (x) => x.tier === removed.tier && !x.removed
-  );
+  
+  const sameRow = game.blocks.filter(x => x.tier === removed.tier && !x.removed);
+
+  
+  if (sameRow.length === 0) return;
+
+  
+  const disable = (b) => { b.class = "disabled"; b.alpha = 0.6; b.clickable = false; };
+
   if (sameRow.length === 2) {
+   
     if (removed.index === 1) {
-      for (const x of sameRow) x.class = "risky";
+    
+      for (const b of sameRow) disable(b);
     } else {
-      for (const x of sameRow) x.class = x.index === 1 ? "critical" : "risky";
+     
+      const mid = sameRow.find(b => b.index === 1);
+      const otherSide = sameRow.find(b => b.index !== 1);
+      if (mid) disable(mid);
+      if (otherSide) { otherSide.class = "critical"; otherSide.alpha = 1; otherSide.clickable = true; }
     }
   } else if (sameRow.length === 1) {
+   
     const last = sameRow[0];
-    last.class = "disabled";
-    last.alpha = 0.6;
-    last.clickable = false;
+    disable(last);
   }
 }
+
 
 function maybeTickGolden() {
   if (Math.random() < MATH.golden.tickChance) {
@@ -271,7 +277,7 @@ export function hitBlockTop(px, py) {
   return null;
 }
 
-/** Fase + HUD/botões */
+
 export function setPhase(next) {
   game.phase = next;
   setButtons({
@@ -287,7 +293,7 @@ export function setPhase(next) {
   refreshHUD(game.phase);
 }
 
-/** Ações da UI */
+
 export function placeBet() {
   const v = sanitizeBet(els.betInput.value);
   game.bet = clamp(isNaN(v) ? 1.0 : v, CONFIG.BET_MIN, CONFIG.BET_MAX);
@@ -338,7 +344,7 @@ export function backgroundGoldenTick() {
   }
 }
 
-/** Mouse handlers (tooltip + click) */
+
 export function onCanvasMouseMove(e) {
   const r = e.currentTarget.getBoundingClientRect();
   const sx = e.clientX - r.left,

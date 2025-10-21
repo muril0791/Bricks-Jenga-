@@ -67,7 +67,7 @@ function drawPoly(points, fill, stroke, lw = 1) {
   }
 }
 
-/** Projeta somente as 3 faces visíveis (frente, direita e topo) */
+
 export function getBlockPolys(b) {
   const { x, y, z, len: L, dep: D, hgt: H, rot90 } = b;
   const BL = rot90 ? D / 2.1 : L / 2.27;
@@ -82,12 +82,12 @@ export function getBlockPolys(b) {
   const p111 = ISO.project(x + BL, y + BD, z + H);
   const p011 = ISO.project(x - BL, y + BD, z + H );
 
-  // Frente real: y = +BD
+  
   const front = [p011, p111, p110, p010];
-  // Direita: x = +BL
+  
   const right = [p101, p111, p110, p100];
-  // Topo
-  const top   = [p001, p101, p111, p011];
+ 
+  const top = [p001, p101, p111, p011];
 
   return { top, right, front };
 }
@@ -98,7 +98,7 @@ export function drawIsoBlock(b, highlighted) {
   ctx.save();
   if (typeof b.alpha === "number") ctx.globalAlpha = b.alpha;
 
-  // Ordem que mantém o “paralelepípedo” fechado e alinhado
+  
   drawPoly(front, COLORS.left[b.class],  COLORS.edge);
   drawPoly(right, COLORS.right[b.class], COLORS.edge);
   drawPoly(top,   COLORS.top[b.class],   COLORS.edge);
@@ -151,7 +151,7 @@ export function startRender() {
   requestAnimationFrame(frame);
 }
 
-/** FX já existente */
+
 export function spawnConfettiAtBlock(block) {
   const base = ISO.project(block.x, block.y, block.z + block.hgt + 10);
   const sx = base.sx * game.scale + game.offsetX;

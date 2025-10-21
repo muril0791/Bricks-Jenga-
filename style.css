@@ -1,4 +1,4 @@
-/* ========== Theme ========== */
+
 :root {
   --bg: #0b0f15;
   --surface: #0f141c;
@@ -22,7 +22,7 @@
   --shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
 }
 
-/* ========== Base ========== */
+
 * {
   box-sizing: border-box;
 }
@@ -40,7 +40,7 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* ========== Layout ========== */
+
 .app {
   display: grid;
   grid-template-columns: 340px 1fr;
@@ -66,7 +66,7 @@ main {
   box-shadow: var(--shadow);
 }
 
-/* stage/canvas ocupam tudo */
+
 #stage,
 #stage > canvas {
   position: absolute;
@@ -76,7 +76,7 @@ main {
   display: block;
 }
 
-/* ========== Brand ========== */
+
 .brand h1 {
   margin: 0 0 8px;
   font-size: 24px;
@@ -86,7 +86,7 @@ main {
   color: var(--muted);
 }
 
-/* ========== Controls ========== */
+
 .controls {
   display: grid;
   gap: 12px;
@@ -130,7 +130,7 @@ select:focus {
   margin: 4px 0;
 }
 
-/* ========== Buttons ========== */
+
 .btn {
   height: 40px;
   padding: 0 12px;
@@ -164,7 +164,7 @@ select:focus {
   border-color: #149345;
 }
 
-/* ========== Info Cards ========== */
+
 .info {
   display: grid;
   gap: 8px;
@@ -183,7 +183,7 @@ select:focus {
   color: var(--muted);
 }
 
-/* ========== Legend ========== */
+
 .legend summary {
   cursor: pointer;
   color: var(--muted);
@@ -221,7 +221,7 @@ select:focus {
   background: var(--chip-disabled);
 }
 
-/* ========== Tooltip ========== */
+
 .tooltip {
   position: absolute;
   background: #0d1117;
@@ -236,7 +236,7 @@ select:focus {
   white-space: nowrap;
 }
 
-/* ========== Responsive ========== */
+
 @media (max-width: 980px) {
   .app {
     grid-template-columns: 1fr;
@@ -251,4 +251,50 @@ select:focus {
     order: 1;
     min-height: 60vh;
   }
+}
+
+
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 24px;
+  height: 28px;
+  flex: 0 0 auto;
+}
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+.switch .slider {
+  position: absolute;
+  inset: 0;
+  background: #0c1117;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+  box-shadow: inset 0 0 0 0 rgba(122,160,255,0);
+}
+.switch .slider::before {
+  content: "";
+  position: absolute;
+  height: 22px;
+  width: 22px;
+  left: 3px;
+  top: 50%;
+  transform: translate(0, -50%);
+  background: var(--text);
+  border-radius: 50%;
+  transition: transform 0.15s ease, background 0.15s ease;
+}
+.switch:hover .slider {
+  box-shadow: inset 0 0 0 3px rgba(122,160,255,0.10);
+}
+.switch input:checked + .slider {
+  background: linear-gradient(180deg, #20c35e, #169a4a);
+  border-color: #149345;
+}
+.switch input:checked + .slider::before {
+  transform: translate(55px, -50%);
+  background: #fff;
 }
