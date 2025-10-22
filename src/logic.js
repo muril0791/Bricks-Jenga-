@@ -19,7 +19,8 @@ export function buildTower() {
 
     for (let i = 0; i < CONFIG.BLOCKS_PER_ROW; i++) {
       const id = `${tier}-${i}`;
-      const klass = Math.random() < 0.33 ? "risky" : "safe";
+      // const klass = Math.random() < 0.33 ? "risky" : "safe";
+      const klass = i === 1 ? "risky" : "safe";
       const sideOffset = (i - 1) * (D + GAP);
 
       
